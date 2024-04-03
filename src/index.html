@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Table</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<!-- Container -->
+<div class="container mx-auto mt-8 p-4">
+
+    <!-- Logo and Search Bar -->
+    <div class="flex items-center mb-4">
+        <img src="D:\website\robiulshop\src\img\logo-removebg-preview.png" alt="Logo" class="mr-1" width="250px">
+        <input type="text" id="searchInput" placeholder="Search product..." class="flex-grow bg-gray-200 text-gray-800 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+        <button onclick="search()" class="ml-4 bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-600">Search</button>
+    </div>
+
+   <!-- Product Table -->
+   <table>
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="productTableBody">
+        <!-- Product rows will be added dynamically here -->
+    </tbody>
+</table>
+
+</div>
+
+<!-- JavaScript to filter products -->
+<script>
+// Provided product data
+const products = [
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/11254e6eb_210878.jpg',name:'রাসূলুল্লাহ (সা.) এর সকাল সন্ধ্যার দু’আ ও যিকর এবং দোয়ার কার্ড',author:'শায়খ আহমাদুল্লাহ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/b2edadac5cd4_129384.jpg',name:'প্যারাডক্সিক্যাল সাজিদ',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/9aa729284_212665.jpg',name:'জীবন যেখানে যেমন',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/ef11c6ea1_213376.jpg',name:'ম্যাসেজ',author:'ড. মিজানুর রহমান আজহারি',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Quran_Theke_Newa_JIboner_Pat-Arif_Azad-d0906-279506.jpg',name:'কুরআন থেকে নেওয়া জীবনের পাঠ',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Al_Quraner_ShobdaboliLevel_1-Jobayer_Al_Mahmud-5e1f6-239846.png',name:'কুরআনের শব্দাবলি - লেভেল ১',author:'জোবায়ের আল মাহমুদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/dd003cb81_170978.jpg',name:'মা, মা, মা এবং বাবা',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Ebar_Bhinno_Kichu_Hok_-Arif_Azad-64903-226821.jpg',name:'এবার ভিন্ন কিছু হোক',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/092e66e9f764_75371.jpg',name:'রাহে বেলায়াত',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/0a41da307_212664.jpg',name:'নবি জীবনের গল্প',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/b71a59819_193764.jpg',name:'প্রোডাক্টিভ মুসলিম',author:'মোহাম্মদ ফারিস',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/c09eb8a5d_154062.jpg',name:'বি স্মার্ট উইথ মুহাম্মাদ (সাঃ)',author:'মাসুদ শরীফ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/a117a539d_160096.jpg',name:'প্রত্যাবর্তন',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/ff16f225e074_90459.jpg',name:'সহীহ মাসনূন ওযীফা',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Parenting-Nazma_Jaman-b9741-141156.jpg',name:'প্যারেন্টিং',author:'নাজমা জামান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Tarabihr_Salate_Quraner_Barta-Shaykh_Ahmadullah-e341b-380270.jpg',name:'তারাবীহর সালাতে কুরআনের বার্তা',author:'শায়খ আহমাদুল্লাহ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Nofser_Biruddhe_Lorai-Mahmud_Bin_Noor-885a9-217630.jpg',name:'নফসের বিরুদ্ধে লড়াই',author:'মাহমুদ বিন নূর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/The_Caring_Wife-Md._Motiur_Rahman-cc50f-218012.jpg',name:'দ্য কেয়ারিং ওয়াইফ',author:'মোঃ মতিউর রহমান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Quraner_Shobdaboli_Level_2-Jobayer_Al_Mahmud-d4903-266924.jpg',name:'কুরআনের শব্দাবলি - লেভেল ২',author:'জোবায়ের আল মাহমুদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/fdbc9cfb0_154918.jpg',name:'ফেরা',author:'সিহিন্তা শরীফা',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Munajat_O_Namaj-Dr_Khandaker_Abdullah_Jahangir-2f607-87341.jpg',name:'মুনাজাত ও নামায',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Aroj_Ali_Somipe_-Arif_Azad-e7450-159496.jpg',name:'আরজ আলী সমীপে',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/9b8e32251_212666.jpg',name:'জবাব',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/The_Caring_Husband-Md._Motiur_Rahman-982ea-218011.jpg',name:'দ্য কেয়ারিং হাজব্যান্ড',author:'মোঃ মতিউর রহমান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/add6c9552_44572.jpg',name:'আল কুরআন এক মহাবিস্ময়',author:'ড. মরিস বুকাইলি',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/c98be001d_46729.jpg',name:'রাসূল (স.) এর শ্রেষ্ঠ সীরাত গ্রন্থ: আর রাহীকুল মাখতূম',author:'আল্লামা সফিউর রহমান মুবারকপুরী (রহ.)',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Ramadan_Planner_Edition_2024-Shaykh_Ahmadullah-3d107-380632.jpg',name:'রমাদান প্ল্যানার (সংস্করণ, ২০২৪)',author:'শায়খ আহমাদুল্লাহ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Hayater_Din_Furole-Arif_Azad-71002-372019.jpg',name:'হায়াতের দিন ফুরোলে',author:'আরিফ আজাদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Quran_Diye_Niyer_Chikitsa_Karun-Hafej_Mahomudul_Hasan_Madani-7460d-116911.jpg',name:'কুরআন দিয়ে নিজের চিকিৎসা করুন',author:'হাফেয মাহমুদুল হাসান মাদানী',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/40113bde4_75367.jpg',name:'হাদীসের নামে জালিয়াতি',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/9a90acbdb_194882.jpg',name:'স্মার্ট প্যারেন্টিং উইথ মুহাম্মাদ (সা.)',author:'মাসুদ শরীফ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Proshantir_Khoje_1-Nouman_Ali_Khan-b8968-177293.JPG',name:'প্রশান্তির খোঁজে ১',author:'নোমান আলী খান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Quran_Sunnar_Aloke_Poshak_Porda_o_deho_S-Dr_Khandaker_Abdullah_Jahangir-146f7-75368.jpg',name:'কুরআন-সুন্নাহর আলোকে পোশাক, পর্দা ও দেহ-সজ্জা',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/d049d31f2_45859.jpg',name:'রাসুলুল্লাহ (স) এর নামায (১ম ও ২য় খণ্ড একত্রে)',author:'আল্লামা মুহাম্মদ নাসীরুদ্দীন আলবানী (রহঃ)',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Ahobban-Mizanur_Rahman_Azhari-df67f-230783.jpg',name:'আহ্বান',author:'ড. মিজানুর রহমান আজহারি',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Salat_Duya_o_Zikor-Dr_Khandaker_Abdullah_Jahangir-7f09e-166080.jpg',name:'সালাত, দু’আ ও যিকর',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Hisnul_Muslim__Jikor_Doya_Chikissa-Shaikh_Saied_Ibne_Ali_Ibne_Oyahfi_Alkait-8f5ab-102516.jpg',name:'হিসনুল মুসলিম : যিকর, দো‘আ, চিকিৎসা',author:'শাইখ সাঈদ ইবনে আলী ইবনে ওয়াহফি আলকাহতানী',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/7eb9cd463_116080.jpg',name:'মুহাম্মাদ (সা.) এর জীবনী আর রাহীকুল মাখতূম',author:'আল্লামা সফিউর রহমান মুবারকপুরী (রহ.)',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/imgrok0720_45894.GIF',name:'কোরআন ও বিজ্ঞানের দৃষ্টিতে পর্দা',author:'মুফতী মুহাম্মদ হাবীব ছামদানী',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/84ad8af65_75271.jpg',name:'আর রাহীকুল মাখতূম বা মোহরাঙ্কিত জান্নাতী সুধা',author:'সাইফুদ্দীন আহমেদ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/5a934f2b4_40331.jpg',name:'আর রাহীকুল মাখতূম',author:'আল্লামা সফিউর রহমান মুবারকপুরী (রহ.)',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/8000108beb24_118676.gif',name:'ইসলাম ও আমাদের জীবন-৬ : তাসাওউফ ও আত্মশুদ্ধি',author:'(شيخ الاسلام مفتي محمد تقي عثماني) শাইখুল ইসলাম মুফতী মুহাম্মাদ তাকী উসমানী',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/f88da3027_181406.jpg',name:'রিভাইভ ইয়োর হার্ট',author:'নোমান আলী খান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/b016bcc55cc4_53626.jpg',name:'আদর্শ নারী',author:'আব্দুর রাযযাক বিন ইউসুফ',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/8a7c92ed2_147520.jpg',name:'ডাবল স্ট্যান্ডার্ড',author:'ডা. শামসুল আরেফীন',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/39f1a3eec_75369.jpg',name:'কুরআন সুন্নাহর আলোকে ইসলামী আকীদা',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/c72c0d42e_208277.jpg',name:'রিযিক্ব',author:'আব্দুল্লাহ বিন আব্দুর রাযযাক',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Aasman-Latiful_islam_Shibli-3695e-289772.png',name:'আসমান',author:'লতিফুল ইসলাম শিবলী',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/e36db8f14_165369.jpg',name:'রামাদানের সওগাত',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Bipod_jokhon_niyamat-Shayekh_Musa_Jibril-442e9-217851.png',name:'বিপদ যখন নিয়ামাত',author:'শাইখ মূসা জিবরীল',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/a88aa3957_49428.jpg',name:'বুখারী শরীফ - ১ম খণ্ড',author:'ইমাম মুহাম্মদ ইবনে ইসমাইল বোখারী (র)',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/607042fc5_120306.jpg',name:'খুশূ-খুযূ',author:'মাসউদুর রহমান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/a1bf8c999_195422.jpg',name:'শিকড়ের সন্ধানে',author:'হামিদা মুবাশ্বেরা',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/Olosota_Jiboner_Shotru-Dr_Khalid_Abu_Shadi-54d94-219201.png',name:'অলসতা : জীবনের শত্রু',author:'ড. খালিদ আবু শাদি',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/0cf44d57d_99160.jpg',name:'আল্লাহর পথে দাওয়াত',author:'ড. খোন্দকার আব্দুল্লাহ জাহাঙ্গীর',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/f67fc7429_69112.jpg',name:'নূরানী পদ্ধতিতে ২৭ ঘন্টায় কুরআন শিক্ষা',author:'মওলানা জহুরুল হক',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/606d54bac_156119.jpg',name:'বন্ধন',author:'নোমান আলী খান',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/6bcf69b88_195356.jpg',name:'জীবন যদি হতো নারী সাহাবির মতো',author:'ড. হানান লাশিন',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/94cc873b9_198365.png',name:'ফেরা ২',author:'বিনতু আদিল',},
+{image:'https://ds.rokomari.store/rokomari110/ProductNew20190903/130X186/You_Must_do_a_Business-Sheikh_Dr_Tawfiq_Chowdhury-f733c-225612.jpg',name:'ইউ মাস্ট ডু বিজনেস',author:'শাইখ ড. তাওফিক চৌধুরি',},
+];
+
+const searchInput = document.getElementById('searchInput');
+const productTableBody = document.getElementById('productTableBody');
+
+function renderProducts(searchTerm) {
+    productTableBody.innerHTML = ''; // Clear previous table rows
+    products.forEach(product => {
+        if (product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+            // Create table row
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img src="${product.image}" alt="${product.name}" class="w-16 h-16"></td>
+                <td>${product.name}</td>
+                <td>${product.author}</td>
+                <td><button class="bg-blue-500 text-white px-4 py-2 rounded">Buy</button></td>
+            `;
+            productTableBody.appendChild(row);
+        }
+    });
+}
+
+// Initial load of products
+renderProducts('');
+
+// Listen for input event on search input field
+searchInput.addEventListener('input', function() {
+    renderProducts(this.value);
+});
+// Function to send order details to WhatsApp
+function sendOrder(productName, author) {
+    // Format message
+    const message = ` আমি এই প্রডাক্ট টি কিনতে চাই, ${productName} by ${author}. এটির দাম কত, জানাবেন। ধন্যবাদ`;
+
+    // Replace '1234567890' with your WhatsApp number
+    const whatsappNumber = '+8801531540211';
+
+    // Encode message with UTF-8 encoding
+    const encodedMessage = encodeURIComponent(message);
+    // Copy message to clipboard
+    const tempInput = document.createElement("textarea");
+    tempInput.value = message;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+
+    // Inform the user
+    alert("আপনার অর্ডারের তথ্য ক্লিপবোর্ডে কপি করা হয়েছে। দয়া করে WhatsApp চ্যাটে পেস্ট করুন এবং অর্ডার করুন।");
+    // Open WhatsApp with pre-filled message
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+// Function to create a buy button with event listener to send order details to WhatsApp
+function createBuyButton(productName, author) {
+    const button = document.createElement('button');
+    button.textContent = 'Buy';
+    button.classList.add('bg-blue-500', 'text-white', 'px-4', 'py-2', 'rounded');
+    button.addEventListener('click', function() {
+        sendOrder(productName, author);
+    });
+    return button;
+}
+
+// Function to render products
+function renderProducts(searchTerm) {
+    productTableBody.innerHTML = ''; // Clear previous table rows
+    products.forEach(product => {
+        if (product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+            // Create table row
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img src="${product.image}" alt="${product.name}" class="w-16 h-16"></td>
+                <td>${product.name}</td>
+                <td>${product.author}</td>
+                <td></td> <!-- Placeholder for buy button -->
+            `;
+            const buyButtonCell = row.querySelector('td:last-child');
+            buyButtonCell.appendChild(createBuyButton(product.name, product.author));
+            productTableBody.appendChild(row);
+        }
+    });
+}
+
+// Initial load of products
+renderProducts('');
+
+// Listen for input event on search input field
+searchInput.addEventListener('input', function() {
+    renderProducts(this.value);
+});
+
+
+</script>
+
+</body>
+</html>
